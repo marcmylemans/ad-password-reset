@@ -1,7 +1,7 @@
 # AD Password Reset Web Tool
 
 A simple, secure, airgapped-friendly web app for delegated password resets in Microsoft Active Directory.  
-Supports auditing, user verification by group, employee number-based password resets, and top secret logging requirements.
+Supports auditing, user verification by group, employee number-based password resets, and logging requirements.
 
 ---
 
@@ -13,7 +13,7 @@ Supports auditing, user verification by group, employee number-based password re
 - **Force user to change password at next logon.**
 - **Modern, responsive web UI (pure CSS, no external dependencies).**
 - **Audit log for every login, reset, and logout (CSV, local only).**
-- **Works in airgapped/secure environments.**
+- **Works in airgapped environments.**
 - **Designed for security and minimal privileges.**
 
 ---
