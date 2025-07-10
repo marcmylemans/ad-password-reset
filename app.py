@@ -94,12 +94,14 @@ def get_ad_users():
         lockout_value = entry['lockoutTime'].value if 'lockoutTime' in entry else None
         is_locked = False
         if lockout_value:
-            # If it's a datetime object, the account is locked
+            # If it's a datetime object
             if hasattr(lockout_value, 'year'):
-                is_locked = True
-            # If it's a number and > 0, also locked
-            elif isinstance(lockout_value, (int, float)) and lockout_value > 0:
-                is_locked = True
+                # Unlocked accounts may have lockoutTime set to 1601-01-01 00:00:00
+                # AD treats lockoutTime of Jan 1, 1601 as "not locked"
+                is_locked = lockout_value.year > 1601
+            # If it's a number
+            elif isinstance(lockout_value, (int, float)):
+                is_locked = lockout_value > 0
         users.append({
             'username': username,
             'employee_number': employee_number,
@@ -108,6 +110,7 @@ def get_ad_users():
     debug_print(f"[get_ad_users] Found users: {users}")
     c.unbind()
     return users
+
 
 
 
@@ -154,7 +157,7 @@ def unlock_user(target_username):
         debug_print("[unlock_user] Could not connect to AD")
         return False, "Could not connect to AD"
     dn = None
-    c.search(AD_USER_OU, f'(sAMAccountName={target_username})', attributes=['distinguishedName'])
+    c.search(AD_USER_OU, f'(sAMAccountName={target_username})', attributes=['distinguishedName', 'lockoutTime'])
     if c.entries:
         dn = c.entries[0]['distinguishedName'].value
         debug_print(f"[unlock_user] Found DN: {dn}")
@@ -164,11 +167,25 @@ def unlock_user(target_username):
         return False, "User not found"
     if dn:
         result = c.modify(dn, {'lockoutTime': [(2, 0)]})
-        debug_print(f"[unlock_user] unlock result: {result} for {dn}")
+        debug_print(f"[unlock_user] modify lockoutTime result: {result} for {dn}, details: {c.result}")
+        # Immediately re-read lockoutTime to verify
+        c.search(AD_USER_OU, f'(sAMAccountName={target_username})', attributes=['lockoutTime'])
+        lockout_value = c.entries[0]['lockoutTime'].value if c.entries else None
         c.unbind()
-        return result, "" if result else (False, "Unlock failed")
+        is_locked = False
+        if lockout_value:
+            if hasattr(lockout_value, 'year'):
+                # Only locked if year > 1601
+                is_locked = lockout_value.year > 1601
+            elif isinstance(lockout_value, (int, float)):
+                is_locked = lockout_value > 0
+        if is_locked:
+            return False, "Unlock failed, account is still locked."
+        return True, ""
     c.unbind()
     return False, "Unknown error"
+
+
 
 
 @app.route('/', methods=['GET', 'POST'])
