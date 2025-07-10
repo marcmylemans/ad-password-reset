@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AD Password Reset - Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        html, body { height: 100%; margin: 0; }
+        body {
+            height: 100vh;
+            background: #f4f7fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+            min-width: 340px;
+            padding: 32px 26px 18px 26px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h3 { margin-bottom: 26px; color: #304156; }
+        .form-label { font-weight: 500; margin-bottom: 5px; }
+        .form-control {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #ccd4e0;
+            border-radius: 6px;
+            margin-bottom: 18px;
+            font-size: 1rem;
+            transition: border 0.2s;
+        }
+        .form-control:focus {
+            border: 1.5px solid #4565ad;
+            outline: none;
+        }
+        .btn {
+            width: 100%;
+            padding: 10px 0;
+            background: #4565ad;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #355091; }
+        .alert {
+            width: 100%;
+            padding: 10px 0;
+            margin-bottom: 18px;
+            background: #ffe1e1;
+            color: #d62d20;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .card-footer {
+            color: #888;
+            font-size: 0.93rem;
+            margin-top: 16px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h3>AD Password Reset</h3>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert">
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <form method="post" autocomplete="off">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" name="username" id="username" required autofocus>
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" name="password" id="password" required>
+            <button type="submit" class="btn">Login</button>
+        </form>
+        <div class="card-footer">
+            Only users in the delegated AD group can login.
+        </div>
+    </div>
+</body>
+</html>

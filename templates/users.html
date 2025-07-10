@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AD Password Reset - Users</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        html, body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7fa; }
+        nav {
+            background: #4565ad;
+            padding: 12px 0;
+            margin-bottom: 32px;
+        }
+        nav .container {
+            max-width: 850px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            font-weight: 500;
+        }
+        nav .btn-logout {
+            background: #fff;
+            color: #4565ad;
+            border: none;
+            border-radius: 5px;
+            padding: 7px 18px;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        nav .btn-logout:hover {
+            background: #e1e8f0;
+        }
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+        }
+        h4 { color: #304156; margin-bottom: 20px; }
+        .alert {
+            width: 100%;
+            padding: 10px 0;
+            margin-bottom: 16px;
+            background: #e5ffe5;
+            color: #277729;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+            margin-bottom: 32px;
+        }
+        th, td {
+            padding: 13px 10px;
+            text-align: left;
+            border-bottom: 1px solid #eaeaea;
+        }
+        th { background: #f5f7fb; color: #2e3d55; }
+        tr:last-child td { border-bottom: none; }
+        .btn-reset {
+            background: #d9534f;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 6px 16px;
+            font-size: 0.97rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-reset:hover { background: #b52b26; }
+        @media (max-width: 650px) {
+            nav .container, .container { max-width: 99%; }
+            th, td { font-size: 0.98rem; }
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <div class="container">
+        <span>AD Password Reset</span>
+        <a href="{{ url_for('logout') }}"><button class="btn-logout">Logout</button></a>
+    </div>
+</nav>
+<div class="container">
+    <h4>User List</h4>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert">
+                {{ messages[0] }}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th style="width: 180px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('reset', username=user.username) }}" style="display:inline;">
+                            <input type="hidden" name="employee_number" value="{{ user.employee_number }}">
+                            <button type="submit" class="btn-reset">Reset Password</button>
+                        </form>
+                    </td>
+                    <td>
+                        <button onclick="this.nextElementSibling.style.display='inline'; this.style.display='none';">Show</button>
+                        <span style="display:none;">{{ user.employee_number or "N/A" }}</span>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
