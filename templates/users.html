@@ -78,6 +78,18 @@
             transition: background 0.2s;
         }
         .btn-reset:hover { background: #b52b26; }
+        .btn-unlock {
+            background: #36a852;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 6px 16px;
+            font-size: 0.97rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-left: 10px;
+        }
+        .btn-unlock:hover { background: #257c39; }
         @media (max-width: 650px) {
             nav .container, .container { max-width: 99%; }
             th, td { font-size: 0.98rem; }
@@ -106,6 +118,8 @@
                 <tr>
                     <th>Username</th>
                     <th style="width: 180px;">Action</th>
+                    <th>Status</th>
+                    <th>Employee #</th>
                 </tr>
             </thead>
             <tbody>
@@ -119,7 +133,19 @@
                         </form>
                     </td>
                     <td>
-                        <button onclick="this.nextElementSibling.style.display='inline'; this.style.display='none';">Show</button>
+                        {% if user.is_locked %}
+                            <span style="color: red;">Locked</span>
+                            <form method="post" action="{{ url_for('unlock', username=user.username) }}" style="display:inline;">
+                                <button type="submit" class="btn-unlock">Unlock</button>
+                            </form>
+                        {% else %}
+                            <span style="color: green;">Active</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button type="button" onclick="this.nextElementSibling.style.display='inline'; this.style.display='none';">
+                            Show
+                        </button>
                         <span style="display:none;">{{ user.employee_number or "N/A" }}</span>
                     </td>
                 </tr>

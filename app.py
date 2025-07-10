@@ -82,15 +82,34 @@ def get_ad_users():
     if not c:
         debug_print("[get_ad_users] Could not connect to AD")
         return []
-    c.search(AD_USER_OU, '(objectClass=user)', attributes=['sAMAccountName', 'employeeNumber'])
+    c.search(
+        AD_USER_OU,
+        '(objectClass=user)',
+        attributes=['sAMAccountName', 'employeeNumber', 'lockoutTime']
+    )
     users = []
     for entry in c.entries:
         username = entry['sAMAccountName'].value
         employee_number = entry['employeeNumber'].value if 'employeeNumber' in entry and entry['employeeNumber'].value else ''
-        users.append({'username': username, 'employee_number': employee_number})
+        lockout_value = entry['lockoutTime'].value if 'lockoutTime' in entry else None
+        is_locked = False
+        if lockout_value:
+            # If it's a datetime object, the account is locked
+            if hasattr(lockout_value, 'year'):
+                is_locked = True
+            # If it's a number and > 0, also locked
+            elif isinstance(lockout_value, (int, float)) and lockout_value > 0:
+                is_locked = True
+        users.append({
+            'username': username,
+            'employee_number': employee_number,
+            'is_locked': is_locked
+        })
     debug_print(f"[get_ad_users] Found users: {users}")
     c.unbind()
     return users
+
+
 
 def reset_password(target_username, employee_number):
     debug_print(f"[reset_password] Attempting reset for: {target_username} with emp#: {employee_number}")
@@ -127,6 +146,29 @@ def reset_password(target_username, employee_number):
     c.unbind()
     return False, "Unknown error"
 
+
+def unlock_user(target_username):
+    debug_print(f"[unlock_user] Attempting unlock for: {target_username}")
+    c = ad_connection()
+    if not c:
+        debug_print("[unlock_user] Could not connect to AD")
+        return False, "Could not connect to AD"
+    dn = None
+    c.search(AD_USER_OU, f'(sAMAccountName={target_username})', attributes=['distinguishedName'])
+    if c.entries:
+        dn = c.entries[0]['distinguishedName'].value
+        debug_print(f"[unlock_user] Found DN: {dn}")
+    else:
+        debug_print(f"[unlock_user] User {target_username} not found in OU {AD_USER_OU}")
+        c.unbind()
+        return False, "User not found"
+    if dn:
+        result = c.modify(dn, {'lockoutTime': [(2, 0)]})
+        debug_print(f"[unlock_user] unlock result: {result} for {dn}")
+        c.unbind()
+        return result, "" if result else (False, "Unlock failed")
+    c.unbind()
+    return False, "Unknown error"
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -175,6 +217,22 @@ def reset(username):
         audit('reset_password_failed', session['user'], target=username, extra=error_msg)
         flash(f"Password reset failed for {username}: {error_msg}")
         debug_print(f"[reset] Password reset failed for {username}: {error_msg}")
+    return redirect(url_for('users'))
+
+@app.route('/unlock/<username>', methods=['POST'])
+def unlock(username):
+    if 'user' not in session:
+        debug_print("[unlock] No session, redirect to login.")
+        return redirect(url_for('login'))
+    success, error_msg = unlock_user(username)
+    if success:
+        audit('unlock_account', session['user'], target=username)
+        flash(f"Account for {username} has been unlocked.")
+        debug_print(f"[unlock] Unlock for {username} succeeded")
+    else:
+        audit('unlock_account_failed', session['user'], target=username, extra=error_msg)
+        flash(f"Account unlock failed for {username}: {error_msg}")
+        debug_print(f"[unlock] Unlock for {username} failed: {error_msg}")
     return redirect(url_for('users'))
 
 @app.route('/logout')
