@@ -24,6 +24,8 @@ Supports auditing, user verification by group, employee number-based password re
 - `flask` and `ldap3` Python packages
 - LDAPS (Active Directory over SSL, port 636)
 - A service account in Active Directory with delegated "Reset user passwords" rights on the user OU
+- A service account in Active Directory with delegated "Read lockoutTime" rights on the user OU
+- A service account in Active Directory with delegated "Write lockoutTime" rights on the user OU
 
 ---
 
