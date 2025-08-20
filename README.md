@@ -41,7 +41,7 @@ Supports auditing, user verification by group, employee number-based password re
 2. **Install requirements:**
 
     ```sh
-    pip install flask ldap3
+    pip install -r requirements.txt
     ```
 
 3. **Configure your settings:**
