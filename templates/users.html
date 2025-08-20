@@ -119,7 +119,6 @@
                     <th>Username</th>
                     <th style="width: 180px;">Action</th>
                     <th>Status</th>
-                    <th>Employee #</th>
                 </tr>
             </thead>
             <tbody>
@@ -141,12 +140,6 @@
                         {% else %}
                             <span style="color: green;">Active</span>
                         {% endif %}
-                    </td>
-                    <td>
-                        <button type="button" onclick="this.nextElementSibling.style.display='inline'; this.style.display='none';">
-                            Show
-                        </button>
-                        <span style="display:none;">{{ user.employee_number or "N/A" }}</span>
                     </td>
                 </tr>
             {% endfor %}
