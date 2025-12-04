@@ -127,7 +127,6 @@
                     <td>{{ user.username }}</td>
                     <td>
                         <form method="post" action="{{ url_for('reset', username=user.username) }}" style="display:inline;">
-                            <input type="hidden" name="employee_number" value="{{ user.employee_number }}">
                             <button type="submit" class="btn-reset">Reset Password</button>
                         </form>
                     </td>
