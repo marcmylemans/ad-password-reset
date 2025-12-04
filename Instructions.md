@@ -9,29 +9,29 @@ This SOP explains installation, configuration, delegated AD permissions, and ope
 
 ## 2. Delegated AD Permissions (Including Screenshots)
 
-### Step 1 — Enable Advanced Features
+### Step 1 - Enable Advanced Features
 In ADUC, enable 'Advanced Features'  
 (View → Advanced Features).
 
 ![](steps-ad_password_reset___04_12_2025/step-0.png)
 
-### Step 2 — Open Security Properties
+### Step 2 - Open Security Properties
 Right‑click the OU → Properties → Security → Advanced.
 
 ![](steps-ad_password_reset___04_12_2025/step-1.png)
 
-### Step 3 — Add Service Account
+### Step 3 - Add Service Account
 Click **Add** → select `svc_passwordreset`.
 
 ![](steps-ad_password_reset___04_12_2025/step-2.png)
 
-### Step 4 — Apply ACL to Descendant User Objects
+### Step 4 - Apply ACL to Descendant User Objects
 Set **Applies to:**  
 **Descendant User Objects**
 
 ![](steps-ad_password_reset___04_12_2025/step-3.png)
 
-### Step 5 — Enable Required Permissions
+### Step 5 - Enable Required Permissions
 Enable:
 - **Read lockoutTime**  
 - **Write lockoutTime**
