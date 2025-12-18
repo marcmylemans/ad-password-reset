@@ -81,6 +81,7 @@
             {% endif %}
         {% endwith %}
         <form method="post" autocomplete="off">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             <label for="username" class="form-label">Username</label>
             <input type="text" class="form-control" name="username" id="username" required autofocus>
             <label for="password" class="form-label">Password</label>
